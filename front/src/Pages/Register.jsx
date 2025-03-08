@@ -1,7 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Register = () => {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+
+    const [success, setSuccess] = useState("");
+    const [error, setError] = useState("");
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+        try {
+            const response = await fetch("http://127.0.0.1:5000/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            setSuccess("Registration successful! Please login.");
+            setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md md:max-w-lg lg:max-w-xl">
@@ -12,7 +60,9 @@ const Register = () => {
                     Create a new account to get started.
                 </p>
 
-                <form className="space-y-6">
+                {error && <p className="text-red-500 text-center">{error}</p>}
+                {success && <p className="text-green-500 text-center">{success}</p>}
+                <form className="space-y-6" onSubmit={handleSubmit}>
                     {/* Name Input */}
                     <div>
                         <label
@@ -24,6 +74,8 @@ const Register = () => {
                         <input
                             type="text"
                             id="name"
+                            value={formData.name}
+                            onChange={handleChange}
                             placeholder="Enter your name"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />
@@ -40,6 +92,8 @@ const Register = () => {
                         <input
                             type="email"
                             id="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             placeholder="Enter your email"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />
@@ -56,6 +110,8 @@ const Register = () => {
                         <input
                             type="password"
                             id="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             placeholder="Enter your password"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />
@@ -72,6 +128,8 @@ const Register = () => {
                         <input
                             type="password"
                             id="confirm-password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
                             placeholder="Confirm your password"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />

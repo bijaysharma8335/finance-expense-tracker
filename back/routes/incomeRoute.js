@@ -7,14 +7,14 @@ import {
     deleteIncome,
 } from "../controllers/incomeController.js";
 
-// import { authMiddleware } from "../middleware/authMiddleware";
+import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // router.post("/add-income", authMiddleware,addIncome);
-router.post("/add-income", addIncome);
-router.get("/get-all-income", getIncomes);
-router.get("/get-income/:id", getIncomeById);
-router.put("/update-income/:id ", updateIncome);
-router.delete("/delete-income/:id", deleteIncome);
+router.post("/",authMiddleware, addIncome);
+router.get("/",authMiddleware,  getIncomes);
+router.get("/:id",authMiddleware,getIncomeById);
+router.put("/:id ",authMiddleware, updateIncome);
+router.delete("/:id",authMiddleware,  deleteIncome);
 
 export default router;
