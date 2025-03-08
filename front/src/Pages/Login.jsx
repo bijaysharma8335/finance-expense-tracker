@@ -9,7 +9,7 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState("");
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         if (!email && !password) {
             setErrors("Please enter email and password");
@@ -20,16 +20,36 @@ const Login = () => {
         } else {
             setErrors("");
 
+            try {
+                const response = await fetch("http://localhost:5000/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+                console.log(data);
+                if (!response.ok) throw new Error(data.message);
+
+                // Store token in localStorage
+                localStorage.setItem("token", data.token);
+                dispatch(setUser({ email, name: data.name, password, role: data.role }));
+                console.log("Login successful!");
+            } catch (error) {
+                console.error("Login failed:", error.message);
+            }
             //save user data to localstorage to access after login . on refreshing th page it will prevent from getting errors
-            localStorage.setItem(
-                "user",
-                JSON.stringify({ email, name: "John", password, role: "admin" })
-            );
-            dispatch(setUser({ email, name: "John", password, role: "admin" }));
+            // localStorage.setItem(
+            //     "user",
+            //     JSON.stringify({ email, name: "John", password, role: "admin" })
+            // );
 
             setEmail("");
             setPassword("");
-            // navigate("/home");
+
+        
         }
     };
     return (

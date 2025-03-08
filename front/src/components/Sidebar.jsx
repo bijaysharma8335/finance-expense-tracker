@@ -14,7 +14,7 @@ const Sidebar = () => {
     };
     return (
         <aside className="w-64 bg-purple-600 text-white p-4">
-            <h2 className="text-2xl font-bold mb-6">Expense Tracker</h2>
+            <h2 className="text-2xl font-bold mb-6  font-poppins">Expense Tracker</h2>
             <nav className="space-y-4">
                 <NavLink
                     to="/"
