@@ -6,50 +6,61 @@ import { setUser } from "../Redux/Reducers/userSlice";
 const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({ email: "", password: "" });
+
     const [errors, setErrors] = useState("");
+
+    const onChangeHandler = (e) => {
+        console.log(e.target.name, e.target.value);
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email && !password) {
-            setErrors("Please enter email and password");
-        } else if (!email) {
-            setErrors("PLease enter email");
-        } else if (!password) {
-            setErrors("please enter password");
-        } else {
-            setErrors("");
 
-            try {
-                const response = await fetch("http://localhost:5000/api/auth/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
+        const { email, password } = formData;
+        if (!email || !password) {
+            setErrors("Please enter both email and password.");
+            return;
+        }
+        setErrors(""); // Clear errors before request
 
-                const data = await response.json();
-                console.log(data);
-                if (!response.ok) throw new Error(data.message);
+        try {
+            const response = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-                // Store token in localStorage
-                localStorage.setItem("token", data.token);
-                dispatch(setUser({ email, name: data.name, password, role: data.role }));
-                console.log("Login successful!");
-            } catch (error) {
-                console.error("Login failed:", error.message);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Login failed");
             }
-            //save user data to localstorage to access after login . on refreshing th page it will prevent from getting errors
-            // localStorage.setItem(
-            //     "user",
-            //     JSON.stringify({ email, name: "John", password, role: "admin" })
-            // );
 
-            setEmail("");
-            setPassword("");
+            const data = await response.json();
+            // console.log("Login successful:", data);
 
-        
+            // Store token securely (Consider HttpOnly cookies for better security)
+            localStorage.setItem("token", data.token);
+            localStorage.setItem(
+                "user",
+                JSON.stringify({ email, name: data.name, role: data.role })
+            );
+
+            dispatch(setUser({ email, name: data.name, role: data.role }));
+
+            navigate("/"); // Redirect after successful login
+
+            // Clear form data on successful login
+            setFormData({ email: "", password: "" });
+        } catch (error) {
+            console.error("Login failed:", error.message);
+            setErrors(error.message);
         }
     };
     return (
@@ -75,8 +86,9 @@ const Login = () => {
                         <input
                             type="email"
                             id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="email"
+                            value={formData.email}
+                            onChange={onChangeHandler}
                             placeholder="Enter your email"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />
@@ -93,8 +105,9 @@ const Login = () => {
                         <input
                             type="password"
                             id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            name="password"
+                            value={formData.password}
+                            onChange={onChangeHandler}
                             placeholder="Enter your password"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                         />

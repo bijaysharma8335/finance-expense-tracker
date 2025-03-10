@@ -14,6 +14,8 @@ import {
 } from "chart.js";
 import { useSelector } from "react-redux";
 
+import { MONTHS } from "../constants/dateConstants";
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -22,7 +24,7 @@ ChartJS.register(
     BarElement,
     ArcElement,
     Title,
-    Tooltip, 
+    Tooltip,
     Legend
 );
 
@@ -81,13 +83,12 @@ const Dashboard = () => {
                     onChange={handleMonthChange}
                 >
                     <option value="All">All Months</option>
-                    <option value="Jan">January</option>
-                    <option value="Feb">February</option>
-                    <option value="Mar">March</option>
-                    <option value="Apr">April</option>
-                    <option value="May">May</option> <option value="May">May</option>{" "}
-                    <option value="May">May</option> <option value="May">May</option>{" "}
-                    <option value="May">May</option>
+
+                    {MONTHS.map((month, key) => (
+                        <option value={month} key={key}>
+                            {month}
+                        </option>
+                    ))}
                 </select>
             </section>
 

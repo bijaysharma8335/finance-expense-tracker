@@ -57,7 +57,7 @@ const Settings = () => {
                         className="border px-3 py-2 rounded-md"
                     >
                         <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <option value="dark bg-gray-800">Dark</option>
                     </select>
                 </div>
             </section>

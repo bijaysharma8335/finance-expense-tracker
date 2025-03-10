@@ -17,10 +17,18 @@ function App() {
     const user = useSelector((state) => state.user.user);
     const dispatch = useDispatch();
     useEffect(() => {
-        // Retrieve user from localStorage if it exists
-        const savedUser = JSON.parse(localStorage.getItem("user"));
+        // Retrieve user from localStorage
+        const savedUser = localStorage.getItem("user");
+
         if (savedUser) {
-            dispatch(setUser(savedUser));
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                if (parsedUser) {
+                    dispatch(setUser(parsedUser));
+                }
+            } catch (error) {
+                console.error("Error parsing user data from localStorage:", error);
+            }
         }
     }, [dispatch]);
     return (
